@@ -74,6 +74,11 @@ namespace InventoryServiceDemo.Controllers
         {
             UserInfo user = await _context.UserInfo.FirstOrDefaultAsync(user => user.Email == email);
 
+            if (user == null)
+            {
+                return null;
+            }
+
             if (VerifyPassword(password, user.Password))
             {
                 return user;
