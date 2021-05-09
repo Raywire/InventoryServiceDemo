@@ -72,7 +72,13 @@ namespace InventoryServiceDemo.Controllers
 
         private async Task<UserInfo> GetUser(string email, string password)
         {
-            return await _context.UserInfo.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            UserInfo user = await _context.UserInfo.FirstOrDefaultAsync(user => user.Email == email);
+
+            if (VerifyPassword(password, user.Password))
+            {
+                return user;
+            }
+            return null;
         }
 
         private string GenerateJwtToken(UserInfo user)
@@ -98,6 +104,11 @@ namespace InventoryServiceDemo.Controllers
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwtToken;
+        }
+
+        private bool VerifyPassword (string password, string passwordHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, passwordHash);
         }
     }
 }
