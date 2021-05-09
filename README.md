@@ -6,3 +6,17 @@ Run the following command on the Nuget Package Manager Console
 ```
 Scaffold-DbContext "Server=localhost,1433;Database=Inventory;User=sa;Password=reallyStrongPwd123;Trusted_Connection=False" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
 ```
+
+## Restore dependencies specified in the project
+```
+dotnet restore
+```
+
+## Build project
+```
+dotnet build
+```
+## Run project
+```
+dotnet run
+```
