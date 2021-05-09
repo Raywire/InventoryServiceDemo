@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using InventoryServiceDemo.DTOs.Requests;
 using InventoryServiceDemo.DTOs.Responses;
 using InventoryServiceDemo.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,13 @@ namespace InventoryServiceDemo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TokenController : ControllerBase
+    public class AuthController : ControllerBase
     {
         public IConfiguration _configuration;
         private readonly InventoryContext _context;
         private IMapper _mapper;
 
-        public TokenController(IConfiguration config, InventoryContext context, IMapper mapper)
+        public AuthController(IConfiguration config, InventoryContext context, IMapper mapper)
         {
             _configuration = config;
             _context = context;
@@ -31,10 +32,10 @@ namespace InventoryServiceDemo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(UserInfo _userData)
+        [Route("login")]
+        public async Task<IActionResult> Post([FromBody] UserLoginRequest _userData)
         {
-
-            if (_userData != null && _userData.Email != null && _userData.Password != null)
+            if(ModelState.IsValid)
             {
                 var user = await GetUser(_userData.Email, _userData.Password);
 
@@ -42,7 +43,8 @@ namespace InventoryServiceDemo.Controllers
                 {
                     var jwtToken = GenerateJwtToken(user);
 
-                    return Ok(new LoginResponse() {
+                    return Ok(new LoginResponse()
+                    {
                         Success = true,
                         Token = jwtToken,
                         User = _mapper.Map<UserInfoReadDto>(user)
@@ -53,10 +55,8 @@ namespace InventoryServiceDemo.Controllers
                     return BadRequest("Invalid credentials");
                 }
             }
-            else
-            {
-                return BadRequest();
-            }
+
+            return BadRequest();
         }
 
         private async Task<UserInfo> GetUser(string email, string password)
