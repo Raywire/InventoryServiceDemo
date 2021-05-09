@@ -22,9 +22,25 @@ namespace InventoryServiceDemo.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Products>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Products>>> GetProducts(bool? inStock, int? skip, int? take)
         {
-            return await _context.Products.ToListAsync();
+            var products = _context.Products.AsQueryable();
+
+            if (inStock != null) // Adds the condition to check availability 
+            {
+                products = _context.Products.Where(i => i.AvailableQuantity > 0);
+            }
+
+            if (skip != null)
+            {
+                products = products.Skip((int)skip);
+            }
+
+            if (take != null)
+            {
+                products = products.Take((int)take);
+            }
+            return await products.ToListAsync();
         }
 
         // GET: api/Products/5
