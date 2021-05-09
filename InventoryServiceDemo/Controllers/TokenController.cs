@@ -5,6 +5,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using InventoryServiceDemo.DTOs.Responses;
 using InventoryServiceDemo.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,11 +21,13 @@ namespace InventoryServiceDemo.Controllers
     {
         public IConfiguration _configuration;
         private readonly InventoryContext _context;
+        private IMapper _mapper;
 
-        public TokenController(IConfiguration config, InventoryContext context)
+        public TokenController(IConfiguration config, InventoryContext context, IMapper mapper)
         {
             _configuration = config;
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -38,7 +42,11 @@ namespace InventoryServiceDemo.Controllers
                 {
                     var jwtToken = GenerateJwtToken(user);
 
-                    return Ok(jwtToken);
+                    return Ok(new LoginResponse() {
+                        Success = true,
+                        Token = jwtToken,
+                        User = _mapper.Map<UserInfoReadDto>(user)
+                    });
                 }
                 else
                 {
