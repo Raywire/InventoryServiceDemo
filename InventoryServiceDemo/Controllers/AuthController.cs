@@ -52,11 +52,22 @@ namespace InventoryServiceDemo.Controllers
                 }
                 else
                 {
-                    return BadRequest("Invalid credentials");
+                    return BadRequest(new ErrorResponse() {
+                        Errors = new List<string>()
+                        {
+                            "Invalid credentials"
+                        },
+                        Success = false
+                    });
                 }
             }
 
-            return BadRequest();
+            return BadRequest(new ErrorResponse() {
+                Errors = new List<string>() {
+                    "Invalid Payload"
+                },
+                Success = false
+            });
         }
 
         private async Task<UserInfo> GetUser(string email, string password)
