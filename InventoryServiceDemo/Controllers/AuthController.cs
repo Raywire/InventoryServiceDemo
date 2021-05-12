@@ -52,22 +52,24 @@ namespace InventoryServiceDemo.Controllers
                 }
                 else
                 {
+                    Errors errors = new Errors();
+                    errors.Message = "Invalid credentials";
                     return BadRequest(new ErrorResponse() {
-                        Errors = new List<string>()
-                        {
-                            "Invalid credentials"
-                        },
+                        Errors = errors,
                         Success = false
                     });
                 }
-            }
+            } 
+            else
+            {
+                Errors errors = new Errors();
+                errors.Message = "Invalid payload";
 
-            return BadRequest(new ErrorResponse() {
-                Errors = new List<string>() {
-                    "Invalid Payload"
-                },
-                Success = false
-            });
+                return BadRequest(new ErrorResponse() {
+                    Errors = errors,
+                    Success = false
+                });
+            }
         }
 
         [HttpPost]
@@ -77,11 +79,11 @@ namespace InventoryServiceDemo.Controllers
             UserInfo user = await _context.UserInfo.FirstOrDefaultAsync(user => user.Email == _userData.Email || user.UserName == _userData.UserName);
             if (user != null)
             {
+                Errors errors = new Errors();
+                errors.Message = "User exists";
                 return BadRequest(new ErrorResponse()
                 {
-                    Errors = new List<string>() {
-                    "User exists"
-                },
+                    Errors = errors,
                     Success = false
                 });
             }
