@@ -16,7 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryServiceDemo.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -33,7 +33,7 @@ namespace InventoryServiceDemo.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Post([FromBody] UserLoginRequest _userData)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest _userData)
         {
             if(ModelState.IsValid)
             {
@@ -68,6 +68,31 @@ namespace InventoryServiceDemo.Controllers
                 },
                 Success = false
             });
+        }
+
+        [HttpPost]
+        [Route("signup")]
+        public async Task<IActionResult> Register([FromBody] UserRegisterDto _userData)
+        {
+            UserInfo user = await _context.UserInfo.FirstOrDefaultAsync(user => user.Email == _userData.Email || user.UserName == _userData.UserName);
+            if (user != null)
+            {
+                return BadRequest(new ErrorResponse()
+                {
+                    Errors = new List<string>() {
+                    "User exists"
+                },
+                    Success = false
+                });
+            }
+
+            var userDataModel = _mapper.Map<UserInfo>(_userData);
+
+            userDataModel.Password = BCrypt.Net.BCrypt.HashPassword(_userData.Password);
+            _context.UserInfo.Add(userDataModel);
+            await _context.SaveChangesAsync();
+
+            return Ok("User has been created");
         }
 
         private async Task<UserInfo> GetUser(string email, string password)
